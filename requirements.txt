@@ -10,6 +10,7 @@ django-permission==0.8.3
 djangorestframework-composed-permissions==0.1
 
 mysql-python==1.2.5
+sqlparse==0.1.14
 markdown==2.5.2
 werkzeug==0.10.1
 django-debug-toolbar==1.2.2

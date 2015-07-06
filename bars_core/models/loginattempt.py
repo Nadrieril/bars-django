@@ -10,7 +10,7 @@ class LoginAttempt(models.Model):
         app_label = 'bars_core'
     user = models.ForeignKey(User, null=True)
     success = models.BooleanField(default=False)
-    sent_username = models.CharField(max_length=128)
+    sent_username = models.CharField(max_length=512)
     timestamp = models.DateTimeField(auto_now_add=True)
     ip = models.CharField(max_length=15)
 

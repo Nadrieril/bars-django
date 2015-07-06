@@ -82,6 +82,11 @@ class StockItemSerializer(serializers.ModelSerializer):
     price = serializers.FloatField(source='display_price')
     sell_to_buy = serializers.FloatField()
 
+    def validate_sell_to_buy(self, value):
+        if value <= 0:
+            raise ValidationError("'sell_to_buy' field has to be nonnegative")
+        return value
+
 
 class StockItemViewSet(viewsets.ModelViewSet):
     queryset = StockItem.objects.all()

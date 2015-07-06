@@ -1,5 +1,5 @@
 from django.db import models
-from rest_framework import serializers, viewsets
+from rest_framework import serializers, viewsets, filters
 
 from bars_django.utils import VirtualField, permission_logic, CurrentBarCreateOnlyDefault, CurrentUserCreateOnlyDefault
 from bars_core.models.bar import Bar
@@ -34,12 +34,22 @@ class NewsSerializer(serializers.ModelSerializer):
     author = serializers.PrimaryKeyRelatedField(read_only=True, default=CurrentUserCreateOnlyDefault())
 
 
+
+class NewsFilterBackend(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        bars = request.query_params.getlist('bar')
+        if len(bars) != 0:
+            return queryset.filter(bar__in=bars)
+        else:
+            return queryset
+
+
 class NewsViewSet(viewsets.ModelViewSet):
     queryset = News.objects.all()
     serializer_class = NewsSerializer
     permission_classes = (PerBarPermissionsOrAnonReadOnly,)
+    filter_backends = (NewsFilterBackend, filters.DjangoFilterBackend, filters.SearchFilter)
     filter_fields = {
-        'bar': ['exact'],
         'timestamp': ['lte', 'gte'],
         'author': ['exact']}
     search_fields = ('name', 'text')

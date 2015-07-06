@@ -126,7 +126,8 @@ reset_mail = {
 Salut,
 
 Ton mot de passe Chocapix a été réinitialisé.
-C'est maintenant "{password}"
+C'est maintenant "{password}".
+Rappel: ton login est "{login}".
 
 Cordialement,
 Les membres du BABE
@@ -137,13 +138,15 @@ class ResetPasswordView(APIView):
 
     def post(self, request, format=None):
         email = request.data.get('email')
+        if email == '':
+            return Response("'email' field cannot be empty", 400)
         user = User.objects.get(email=email)
 
         password = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(6))
 
         mail = reset_mail.copy()
         mail['recipient_list'] = [user.email]
-        mail['message'] = mail['message'].format(email=user.email, password=password, name=user.get_full_name())
+        mail['message'] = mail['message'].format(email=user.email, password=password, name=user.get_full_name(), login=user.username)
         send_mail(**mail)
 
         user.set_password(password)

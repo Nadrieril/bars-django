@@ -1,3 +1,6 @@
+# encoding: utf8
+from django.core.mail import send_mail
+
 from django.http import Http404
 from rest_framework import serializers
 from rest_framework.serializers import ValidationError
@@ -393,6 +396,19 @@ class RefundTransactionSerializer(BaseTransactionSerializer, AccountAmountSerial
 
         return obj
 
+punishement_notification_mail = {
+    'subject': "[Chocapix] Notification d'amende",
+    'message': u"""
+Salut,
+
+{name} a infligé une amende de {amount} € à ton compte dans le bar {bar}.
+La raison invoquée est la suivante :
+    «{cause}»
+
+Ce mail a été envoyé automatiquement par Chocapix.
+"""
+}
+
 
 class PunishTransactionSerializer(BaseTransactionSerializer, AccountAmountSerializer):
     motive = serializers.CharField()
@@ -400,12 +416,25 @@ class PunishTransactionSerializer(BaseTransactionSerializer, AccountAmountSerial
     def create(self, data):
         t = super(PunishTransactionSerializer, self).create(data)
 
-        t.accountoperation_set.create(
+        operation = t.accountoperation_set.create(
             target=data["account"],
             delta=-data["amount"])
         t.transactiondata_set.create(
             label='motive',
             data=data["motive"])
+
+        ## notify the account owner
+        message = punishement_notification_mail.copy()
+        message["from_email"] = t.author.email
+        account = operation.target
+        message["recipient_list"] = [account.owner.email]
+        message["message"] = message["message"].format(
+            name=t.author.get_full_name(),
+            amount=data["amount"],
+            cause=data["motive"],
+            bar=account.bar.name
+        )
+        send_mail(**message)
 
         return t
 
@@ -528,7 +557,7 @@ class MealTransactionSerializer(BaseTransactionSerializer):
         for aop in aops:
             obj["accounts"].append({
                 'account': aop.target.id,
-                'ratio': abs(aop.delta) / total_price
+                'ratio': abs(aop.delta) / total_price if total_price != 0 else 0
             })
 
         data = transaction.transactiondata_set.all()[0]

@@ -6,7 +6,7 @@ MAINTAINER Nadrieril "nadrieril@eleves.polytechnique.fr"
 #ENV https_proxy http://kuzh.polytechnique.fr:8080
 
 RUN apt-get update && \
-    apt-get install -y cron python-pip gunicorn python-dev libmysqlclient-dev python-dateutil
+    apt-get install -y cron python-pip gunicorn bpython python-dev libmysqlclient-dev python-dateutil
 
 RUN mkdir /app
 WORKDIR /app
