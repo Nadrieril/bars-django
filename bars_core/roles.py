@@ -61,6 +61,7 @@ roles_map['appromanager'] = \
         'bars_transactions.add_approtransaction',
         'bars_items.add_suggesteditem',
         'bars_items.change_suggesteditem',
+        'bars_items.delete_suggesteditem',
 ]
 roles_map['stockmanager'] = \
     roles_map['appromanager'] + \

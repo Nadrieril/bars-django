@@ -84,7 +84,7 @@ class AccountViewSet(viewsets.ModelViewSet):
     @decorators.list_route(methods=['get'])
     def ranking(self, request):
         from bars_stats.utils import compute_ranking
-        ranking = compute_ranking(request, annotate=models.Sum('accountoperation__delta'))
+        ranking = compute_ranking(request, annotate=models.Sum(models.F('accountoperation__delta')))
         if ranking is None:
             return HttpResponseBadRequest("I can only give a ranking within a bar")
         else:
