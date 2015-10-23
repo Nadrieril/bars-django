@@ -90,7 +90,7 @@ class StockItemSerializer(serializers.ModelSerializer):
 
     def validate_sell_to_buy(self, value):
         if value <= 0:
-            raise ValidationError(_("'sell_to_buy' field has to be nonnegative"))
+            raise ValidationError("'sell_to_buy' field has to be nonnegative")
         return value
 
 
