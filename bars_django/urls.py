@@ -17,6 +17,7 @@ from bars_items.models.sellitem import SellItemViewSet
 from bars_items.models.stockitem import StockItemViewSet
 from bars_items.models.itemdetails import ItemDetailsViewSet
 from bars_items.models.buyitem import BuyItemViewSet, BuyItemPriceViewSet
+from bars_items.models.suggesteditem import SuggestedItemViewSet
 
 from bars_transactions.views import TransactionViewSet
 
@@ -48,6 +49,7 @@ router.register('news', NewsViewSet)
 router.register('bugreport', BugReportViewSet)
 
 router.register('menu', MenuViewSet)
+router.register('suggested_items',SuggestedItemViewSet)
 
 
 urlpatterns = patterns(
