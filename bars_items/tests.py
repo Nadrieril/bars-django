@@ -12,6 +12,7 @@ from bars_items.models.buyitem import BuyItem, BuyItemSerializer, BuyItemPrice, 
 from bars_items.models.itemdetails import ItemDetails, ItemDetailsSerializer
 from bars_items.models.sellitem import SellItem, SellItemSerializer
 from bars_items.models.stockitem import StockItem, StockItemSerializer
+from bars_items.models.suggesteditem import SuggestedItem, SuggestedItemSerializer
 
 
 def reload(obj):
@@ -212,3 +213,18 @@ class StockItemTests(ItemTests, AutoTestBarMixin):
         self.change_url = ('/stockitem/%d/' % self.stockitem.id) + '?bar=%s'
         self.update_data = StockItemSerializer(self.stockitem).data
         self.update_data['price'] = 4
+        
+class SuggestedItemTests(ItemTests, AutoTestBarMixin):
+    @classmethod
+    def setUpTestData(self):
+        super(SuggestedItemTests, self).setUpTestData()
+        self.model = SuggestedItem
+
+        self.get_url = '/suggesteditem/'
+
+        self.create_url = '/suggesteditem/?bar=%s'
+        self.create_data = {'name': 'Brioche', 'voters_list': [self.user]}
+
+        self.change_url = ('/suggesteditem/%d/' % self.suggesteditem.id) + '?bar=%s'
+        self.update_data = SuggestedItemSerializer(self.suggesteditem).data
+
