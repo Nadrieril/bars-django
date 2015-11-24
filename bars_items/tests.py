@@ -54,18 +54,21 @@ class AutoTestChangeBarMixin():
     def test_change(self):
         # Unauthenticated
         response = self.client.put(self.change_url % self.bar.id, self.update_data)
+        print response
         self.assertEqual(response.status_code, 401)
 
     def test_change1(self):
         # Wrong permissions
         self.client.force_authenticate(user=self.user)
         response = self.client.put(self.change_url % self.bar.id, self.update_data)
+        print response
         self.assertEqual(response.status_code, 403)
 
     def test_change2(self):
         # Correct permissions
         self.client.force_authenticate(user=self.staff_user)
         response = self.client.put(self.change_url % self.bar.id, self.update_data)
+        print response
         self.assertEqual(response.status_code, 200)
 
     def test_change3(self):
@@ -139,7 +142,8 @@ class ItemTests(APITestCase):
         self.staff_user = reload(self.staff_user)
 
         self.sellitem, _ = SellItem.objects.get_or_create(bar=self.bar, name="Chocolat", tax=0.2)
-        self.suggesteditem, _ = SuggestedItem.objects.get_or_create(bar=self.bar, name="Concombre", voters_list=[self.user.id])
+        self.suggesteditem, _ = SuggestedItem.objects.get_or_create(bar=self.bar, name="Concombre")
+        #self.suggesteditem.voters_list.add(self.user)
         self.itemdetails, _ = ItemDetails.objects.get_or_create(name="Chocolat")
         self.buyitem, _ = BuyItem.objects.get_or_create(details=self.itemdetails, itemqty=2.5)
         self.stockitem, _ = StockItem.objects.get_or_create(bar=self.bar, sellitem=self.sellitem, details=self.itemdetails, price=1)
@@ -221,11 +225,12 @@ class SuggestedItemTests(ItemTests, AutoTestBarMixin):
         super(SuggestedItemTests, self).setUpTestData()
         self.model = SuggestedItem
 
-        self.get_url = '/suggesteditem/'
+        self.get_url = '/suggested_items/'
 
-        self.create_url = '/suggesteditem/?bar=%s'
-        self.create_data = {'name': 'Brioche', 'voters_list': [self.user]}
+        self.create_url = '/suggested_items/?bar=%s'
+        self.create_data = {'name': 'Brioche'}
+        print 'suggestedItem : '+str(self.suggesteditem)
 
-        self.change_url = ('/suggesteditem/%d/' % self.suggesteditem.id) + '?bar=%s'
+        self.change_url = ('/suggested_items/%d/' % self.suggesteditem.id) + '?bar=%s'
         self.update_data = SuggestedItemSerializer(self.suggesteditem).data
 
