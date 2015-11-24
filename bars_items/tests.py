@@ -229,7 +229,6 @@ class SuggestedItemTests(ItemTests, AutoTestBarMixin):
 
         self.create_url = '/suggested_items/?bar=%s'
         self.create_data = {'name': 'Brioche'}
-        print 'suggestedItem : '+str(self.suggesteditem)
 
         self.change_url = ('/suggested_items/%d/' % self.suggesteditem.id) + '?bar=%s'
         self.update_data = SuggestedItemSerializer(self.suggesteditem).data
