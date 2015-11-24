@@ -54,21 +54,18 @@ class AutoTestChangeBarMixin():
     def test_change(self):
         # Unauthenticated
         response = self.client.put(self.change_url % self.bar.id, self.update_data)
-        print response
         self.assertEqual(response.status_code, 401)
 
     def test_change1(self):
         # Wrong permissions
         self.client.force_authenticate(user=self.user)
         response = self.client.put(self.change_url % self.bar.id, self.update_data)
-        print response
         self.assertEqual(response.status_code, 403)
 
     def test_change2(self):
         # Correct permissions
         self.client.force_authenticate(user=self.staff_user)
         response = self.client.put(self.change_url % self.bar.id, self.update_data)
-        print response
         self.assertEqual(response.status_code, 200)
 
     def test_change3(self):
