@@ -139,6 +139,7 @@ class ItemTests(APITestCase):
         self.staff_user = reload(self.staff_user)
 
         self.sellitem, _ = SellItem.objects.get_or_create(bar=self.bar, name="Chocolat", tax=0.2)
+        self.suggesteditem, _ = SuggestedItem.objects.get_or_create(bar=self.bar, name="Concombre", voters_list=[self.user.id])
         self.itemdetails, _ = ItemDetails.objects.get_or_create(name="Chocolat")
         self.buyitem, _ = BuyItem.objects.get_or_create(details=self.itemdetails, itemqty=2.5)
         self.stockitem, _ = StockItem.objects.get_or_create(bar=self.bar, sellitem=self.sellitem, details=self.itemdetails, price=1)
