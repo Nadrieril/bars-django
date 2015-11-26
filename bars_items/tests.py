@@ -139,7 +139,7 @@ class ItemTests(APITestCase):
         self.staff_user = reload(self.staff_user)
 
         self.sellitem, _ = SellItem.objects.get_or_create(bar=self.bar, name="Chocolat", tax=0.2)
-        self.suggesteditem, _ = SuggestedItem.objects.get_or_create(bar=self.bar, name="Concombre")
+        #self.suggesteditem, _ = SuggestedItem.objects.get_or_create(bar=self.bar, name="Concombre")
         #self.suggesteditem.voters_list.add(self.user)
         self.itemdetails, _ = ItemDetails.objects.get_or_create(name="Chocolat")
         self.buyitem, _ = BuyItem.objects.get_or_create(details=self.itemdetails, itemqty=2.5)
@@ -216,17 +216,116 @@ class StockItemTests(ItemTests, AutoTestBarMixin):
         self.update_data = StockItemSerializer(self.stockitem).data
         self.update_data['price'] = 4
         
-class SuggestedItemTests(ItemTests, AutoTestBarMixin):
+class SuggestedItemTests(APITestCase):
     @classmethod
     def setUpTestData(self):
         super(SuggestedItemTests, self).setUpTestData()
-        self.model = SuggestedItem
+        self.bar, _ = Bar.objects.get_or_create(id='natationjone')
+        self.bar2, _ = Bar.objects.get_or_create(id='avironjone')
 
-        self.get_url = '/suggested_items/'
+        self.user, _ = User.objects.get_or_create(username='nadrieril')
+        self.user2, _ = User.objects.get_or_create(username='ntag')
+        self.user3, _ = User.objects.get_or_create(username='tizot')
 
-        self.create_url = '/suggested_items/?bar=%s'
-        self.create_data = {'name': 'Brioche'}
+        Role.objects.get_or_create(name='customer', bar=self.bar, user=self.user2)
+        self.user2 = User.objects.get(username='ntag')
+        Role.objects.get_or_create(name='appromanager', bar=self.bar, user=self.user3)
+        self.user2 = User.objects.get(username='tizot')
 
-        self.change_url = ('/suggested_items/%d/' % self.suggesteditem.id) + '?bar=%s'
-        self.update_data = SuggestedItemSerializer(self.suggesteditem).data
+        self.create_data = {'name': 'test'}
+        self.update_data = {'name': 'test2'}
+        self.suggesteditem, _ = SuggestedItem.objects.get_or_create(bar=self.bar, name='')
 
+
+    def test_get_suggesteditems(self):
+        response = self.client.get('/suggested_items/')
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['name'], self.suggesteditem.name)
+
+
+    def test_create_suggesteditems(self):
+        # Unauthenticated
+        response = self.client.post('/suggested_items/?bar=natationjone', self.create_data)
+        self.assertEqual(response.status_code, 401)
+
+    def test_create_suggesteditems1(self):
+        # Wrong permissions
+        self.client.force_authenticate(user=self.user)
+        response = self.client.post('/suggested_items/?bar=natationjone', self.create_data)
+        self.assertEqual(response.status_code, 403)
+
+    def test_create_suggesteditems2(self):
+        # Correct permissions
+        self.client.force_authenticate(user=self.user2)
+        response = self.client.post('/suggested_items/?bar=natationjone', self.create_data)
+        self.assertEqual(response.status_code, 201)
+
+    def test_create_suggesteditems3(self):
+        # Wrong bar
+        self.client.force_authenticate(user=self.user2)
+        response = self.client.post('/suggested_items/?bar=avironjone', self.create_data)
+        self.assertEqual(response.status_code, 403)
+
+    def test_create_suggesteditems4(self):
+        # Non-existing bar
+        self.client.force_authenticate(user=self.user2)
+        response = self.client.post('/suggested_items/?bar=rugbyrouje', self.create_data)
+        self.assertEqual(response.status_code, 404)
+        
+    def test_update_suggesteditems(self):
+        # Unauthenticated
+        response = self.client.put(('/suggested_items/%d/' % self.suggesteditem.id) + '?bar=natationjone', self.update_data)
+        self.assertEqual(response.status_code, 401)
+
+    def test_update_suggesteditems1(self):
+        # Wrong permissions
+        self.client.force_authenticate(user=self.user)
+        response = self.client.put(('/suggested_items/%d/' % self.suggesteditem.id) + '?bar=natationjone', self.update_data)
+        self.assertEqual(response.status_code, 403)
+
+    def test_update_suggesteditems2(self):
+        # Correct permissions
+        self.client.force_authenticate(user=self.user3)
+        response = self.client.put(('/suggested_items/%d/' % self.suggesteditem.id) + '?bar=natationjone', self.update_data)
+        self.assertEqual(response.status_code, 200)
+
+    def test_update_suggesteditems3(self):
+        # Wrong bar
+        self.client.force_authenticate(user=self.user3)
+        response = self.client.put(('/suggested_items/%d/' % self.suggesteditem.id) + '?bar=avironjone', self.update_data)
+        self.assertEqual(response.status_code, 403)
+
+    def test_update_suggesteditems4(self):
+        # Non-existing bar
+        self.client.force_authenticate(user=self.user3)
+        response = self.client.put(('/suggested_items/%d/' % self.suggesteditem.id) + '?bar=rugbyrouje', self.update_data)
+        self.assertEqual(response.status_code, 404)
+        
+    def test_delete_suggesteditems(self):
+        # Unauthenticated
+        response = self.client.delete(('/suggested_items/%d/' % self.suggesteditem.id) + '?bar=natationjone')
+        self.assertEqual(response.status_code, 401)
+
+    def test_delete_suggesteditems1(self):
+        # Wrong permissions
+        self.client.force_authenticate(user=self.user)
+        response = self.client.delete(('/suggested_items/%d/' % self.suggesteditem.id) + '?bar=natationjone')
+        self.assertEqual(response.status_code, 403)
+
+    def test_delete_suggesteditems2(self):
+        # Correct permissions
+        self.client.force_authenticate(user=self.user3)
+        response = self.client.delete(('/suggested_items/%d/' % self.suggesteditem.id) + '?bar=natationjone')
+        self.assertEqual(response.status_code, 204)
+
+    def test_delete_suggesteditems3(self):
+        # Wrong bar
+        self.client.force_authenticate(user=self.user3)
+        response = self.client.delete(('/suggested_items/%d/' % self.suggesteditem.id) + '?bar=avironjone')
+        self.assertEqual(response.status_code, 403)
+
+    def test_delete_suggesteditems4(self):
+        # Non-existing bar
+        self.client.force_authenticate(user=self.user3)
+        response = self.client.delete(('/suggested_items/%d/' % self.suggesteditem.id) + '?bar=rugbyrouje')
+        self.assertEqual(response.status_code, 404)
