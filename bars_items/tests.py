@@ -230,7 +230,7 @@ class SuggestedItemTests(APITestCase):
         Role.objects.get_or_create(name='customer', bar=self.bar, user=self.user2)
         self.user2 = User.objects.get(username='ntag')
         Role.objects.get_or_create(name='appromanager', bar=self.bar, user=self.user3)
-        self.user2 = User.objects.get(username='tizot')
+        self.user3 = User.objects.get(username='tizot')
 
         self.create_data = {'name': 'test'}
         self.update_data = {'name': 'test2'}
@@ -272,6 +272,41 @@ class SuggestedItemTests(APITestCase):
         response = self.client.post('/suggested_items/?bar=rugbyrouje', self.create_data)
         self.assertEqual(response.status_code, 404)
         
+    def test_vote_suggesteditems(self):
+        # Unauthenticated
+        response = self.client.post(('/suggested_items/%d/' % self.suggesteditem.id) + 'vote/?bar=natationjone')
+        self.assertEqual(response.status_code, 401)
+
+    def test_vote_suggesteditems1(self):
+        # Wrong permissions
+        self.client.force_authenticate(user=self.user)
+        response = self.client.post(('/suggested_items/%d/' % self.suggesteditem.id) + 'vote/?bar=natationjone')
+        self.assertEqual(response.status_code, 403)
+
+    def test_vote_suggesteditems1_0(self):
+        # Correct permissions
+        self.client.force_authenticate(user=self.user2)
+        response = self.client.post(('/suggested_items/%d/' % self.suggesteditem.id) + 'vote/?bar=natationjone')
+        self.assertEqual(response.status_code, 200)
+
+    def test_vote_suggesteditems2(self):
+        # Correct permissions
+        self.client.force_authenticate(user=self.user3)
+        response = self.client.post(('/suggested_items/%d/' % self.suggesteditem.id) + 'vote/?bar=natationjone')
+        self.assertEqual(response.status_code, 200)
+
+    def test_vote_suggesteditems3(self):
+        # Wrong bar
+        self.client.force_authenticate(user=self.user3)
+        response = self.client.post(('/suggested_items/%d/' % self.suggesteditem.id) + 'vote/?bar=avironjone')
+        self.assertEqual(response.status_code, 403)
+
+    def test_vote_suggesteditems4(self):
+        # Non-existing bar
+        self.client.force_authenticate(user=self.user3)
+        response = self.client.post(('/suggested_items/%d/' % self.suggesteditem.id) + 'vote/?bar=rugbyrouje')
+        self.assertEqual(response.status_code, 404)  
+      
     def test_update_suggesteditems(self):
         # Unauthenticated
         response = self.client.put(('/suggested_items/%d/' % self.suggesteditem.id) + '?bar=natationjone', self.update_data)
@@ -280,6 +315,12 @@ class SuggestedItemTests(APITestCase):
     def test_update_suggesteditems1(self):
         # Wrong permissions
         self.client.force_authenticate(user=self.user)
+        response = self.client.put(('/suggested_items/%d/' % self.suggesteditem.id) + '?bar=natationjone', self.update_data)
+        self.assertEqual(response.status_code, 403)
+
+    def test_update_suggesteditems1_0(self):
+        # Wrong permissions
+        self.client.force_authenticate(user=self.user2)
         response = self.client.put(('/suggested_items/%d/' % self.suggesteditem.id) + '?bar=natationjone', self.update_data)
         self.assertEqual(response.status_code, 403)
 
@@ -312,6 +353,12 @@ class SuggestedItemTests(APITestCase):
         response = self.client.delete(('/suggested_items/%d/' % self.suggesteditem.id) + '?bar=natationjone')
         self.assertEqual(response.status_code, 403)
 
+    def test_delete_suggesteditems1_0(self):
+        # Wrong permissions
+        self.client.force_authenticate(user=self.user2)
+        response = self.client.delete(('/suggested_items/%d/' % self.suggesteditem.id) + '?bar=natationjone')
+        self.assertEqual(response.status_code, 403)
+        
     def test_delete_suggesteditems2(self):
         # Correct permissions
         self.client.force_authenticate(user=self.user3)
