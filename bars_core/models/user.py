@@ -62,7 +62,7 @@ class User(AbstractBaseUser):
     REQUIRED_FIELDS = []
 
     def has_perm(self, perm, obj=None):
-        if self.is_active and self.is_superuser:
+        if self.is_active and self.is_superuser and perm != "bars_transactions.change_transaction":
             return True
 
         return _user_has_perm(self, perm, obj)
