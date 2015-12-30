@@ -148,6 +148,10 @@ def import_data():
     from bars_core.models.user import User
 
     User.objects.create_superuser('admin', 'admin')
+    admin=User.objects.get(username="admin")
+    admin.pseudo=u'admin'
+    admin = importer.save_or_locate(admin)
+
 
     user_1 = User()
     user_1.username = u'nadri'
@@ -215,6 +219,12 @@ def import_data():
     account_6.bar = bar_2
     account_6.owner = user_4
     account_6 = importer.save_or_locate(account_6)
+
+    account_7 = Account()
+    account_7.bar = bar_1
+    account_7.owner = admin
+    account_7 = importer.save_or_locate(account_7)
+
 
     # Processing model: SellItem
 
