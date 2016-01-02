@@ -10,8 +10,9 @@ from bars_core.models.account import Account
 from bars_transactions.perms import TransactionAuthorPermissionLogic
 
 
-@permission_logic(BarRolePermissionLogic())
+
 @permission_logic(TransactionAuthorPermissionLogic(field_name='author'))
+
 class Transaction(models.Model):
     class Meta:
         app_label = 'bars_transactions'

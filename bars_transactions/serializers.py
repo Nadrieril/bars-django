@@ -35,6 +35,7 @@ class BaseTransactionSerializer(serializers.ModelSerializer):
 
             if self.context.get('request') is not None:
                 authed_user = self.context['request'].user
+                ## if the current user is the target of the punishment he cannot cancel it
                 obj['can_cancel'] = authed_user.has_perm('bars_transactions.change_transaction', transaction)
 
             obj['_type'] = "Transaction"
