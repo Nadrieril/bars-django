@@ -20,6 +20,8 @@ def reload(obj):
 
 class TransactionTests(APITestCase):
     @classmethod
+
+    #Set up data for TransactionTests : implementation of users, items, transactions
     def setUpTestData(self):
         super(TransactionTests, self).setUpTestData()
         self.bar, _ = Bar.objects.get_or_create(id='barjone')
@@ -31,9 +33,11 @@ class TransactionTests(APITestCase):
         self.account, _ = Account.objects.get_or_create(bar=self.bar, owner=self.user)
         self.account.money = 100
         self.account.save()
+
         self.wrong_user, _ = User.objects.get_or_create(username='wrong_user')
         self.wrong_account, _ = Account.objects.get_or_create(bar=self.wrong_bar, owner=self.wrong_user)
 
+        #we define a member of the staff in the bar
         self.staff_user, _ = User.objects.get_or_create(username='staff_user')
         self.staff_account, _ = Account.objects.get_or_create(bar=self.bar, owner=self.staff_user)
         self.staff_role, _ = Role.objects.get_or_create(name='staff', bar=self.bar, user=self.staff_user)
@@ -59,7 +63,6 @@ class TransactionTests(APITestCase):
 
     def test_cancel_transaction(self):
         self.client.force_authenticate(user=self.user)
-
         response = self.client.put(self.transaction_url + 'cancel/', {})
         self.assertEqual(response.status_code, 200)
         self.assertTrue(reload(self.transaction).canceled)
@@ -95,45 +98,3 @@ class TransactionTests(APITestCase):
         self.assertEqual(response.status_code, 403)
         self.assertFalse(reload(transaction).canceled)
 
-    # TODO: move to operation tests
-    def test_create_cancel_buytransaction(self):
-        data = {'type':'buy', 'stockitem':self.stockitem.id, 'qty':1}
-        start_qty = reload(self.stockitem).qty
-
-        self.client.force_authenticate(user=self.user)
-
-        response = self.client.post('/transaction/?bar=%s' % self.bar.id, data)
-        self.assertEqual(response.status_code, 201)
-        end_qty = reload(self.stockitem).qty
-        self.assertEqual(end_qty, start_qty - 1. / self.stockitem.get_unit('sell'))
-        transaction_id = response.data['id']
-
-        response2 = self.client.put('/transaction/%d/cancel/' % transaction_id, {})
-        self.assertEqual(response2.status_code, 200)
-        self.assertEqual(reload(self.stockitem).qty, start_qty)
-
-        response3 = self.client.put('/transaction/%d/cancel/' % transaction_id, {})
-        self.assertEqual(response3.status_code, 200)
-        self.assertEqual(reload(self.stockitem).qty, start_qty)
-
-        response4 = self.client.put('/transaction/%d/restore/' % transaction_id, {})
-        self.assertEqual(response4.status_code, 200)
-        self.assertEqual(reload(self.stockitem).qty, end_qty)
-
-
-    def test_cancel_transaction_after_threshold(self):
-        self.bar.cancel_transaction_threshold = 48
-        self.bar.save()
-        transaction = Transaction.objects.create(bar=self.bar, author=self.user)
-        transaction.timestamp = timezone.now() - timedelta(hours=49)
-        transaction.save()
-
-        self.client.force_authenticate(user=self.user)
-        response = self.client.put('/transaction/%d/cancel/' % transaction.id, {})
-        self.assertEqual(response.status_code, 403)
-        self.assertFalse(reload(transaction).canceled)
-
-        self.client.force_authenticate(user=self.staff_user)
-        response = self.client.put('/transaction/%d/cancel/' % transaction.id, {})
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(reload(transaction).canceled)
