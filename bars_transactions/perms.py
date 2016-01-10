@@ -23,5 +23,5 @@ class TransactionAuthorPermissionLogic(AuthorPermissionLogic):
             if timezone.now() - obj.timestamp > timedelta(hours=threshold):
                 return False
 
-# For other cases
-                    return bar_role_perm or super(TransactionAuthorPermissionLogic, self).has_perm(user, perm, obj)
+        # For other cases
+        return bar_role_perm or super(TransactionAuthorPermissionLogic, self).has_perm(user, perm, obj)
