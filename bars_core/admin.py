@@ -19,7 +19,7 @@ class UserAdmin(admin.ModelAdmin):
     ordering       = ('pseudo', )
     search_fields  = ('lastname', 'firstname')
     exclude = None
-    actions = ['admin', 'treso', 'respo_appro', 'respo_facho', 'respo_news']
+    actions = ['admin', 'treso', 'respo_appro', 'respo_facho', 'respo_news', 'respo_inventaire']
     action_form = BarForm
 
     def admin(self, request, queryset):
@@ -54,6 +54,12 @@ class UserAdmin(admin.ModelAdmin):
             Role.objects.create(name="newsmanager", bar=Bar.objects.get(id=bar), user=user)
     respo_news.short_description = "Donner les droits de respo news"
 
+    def respo_inventaire(self, request, queryset):
+        for user in queryset:
+            bar = request.POST.get('bar')
+            Role.objects.create(name="inventorymanager", bar=Bar.objects.get(id=bar), user=user)
+    respo_inventaire.short_description = "Donner les droits de respo inventaire"
+
 
 class RoleAdmin(admin.ModelAdmin):
    list_display   = ('user', 'bar', 'name')
@@ -67,7 +73,7 @@ class AccountAdmin(admin.ModelAdmin):
     ordering       = ('bar', )
     list_filter    = ('bar', )
     search_fields  = ('owner__lastname', 'owner__firstname', 'owner__username' )
-    exclude = None 
+    exclude = None
 
     def owner_firstname(self, obj):
         return obj.owner.firstname
