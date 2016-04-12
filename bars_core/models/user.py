@@ -192,7 +192,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 reset_mail = {
-    'from_email': 'babe@eleves.polytechnique.fr',
+    'from_email': 'babe@binets.polytechnique.fr',
     'subject': 'Mot de passe Chocapix',
     'message': u"""
 Salut,

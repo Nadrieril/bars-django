@@ -412,7 +412,7 @@ class RefundTransactionSerializer(BaseTransactionSerializer, AccountAmountSerial
         return obj
 
 punishment_notification_mail = {
-    'from_email': "babe@eleves.polytechnique.fr",
+    'from_email': "babe@binets.polytechnique.fr",
     'subject': "[Chocapix] Notification d'amende",
     'message': u"""
 Salut,
@@ -500,7 +500,7 @@ class AgiosTransactionSerializer(BaseTransactionSerializer, AccountAmountSeriali
 
         ## notify the account owner
         message = agios_notification_mail.copy()
-        message["from_email"] = "babe@eleves.polytechnique.fr"
+        message["from_email"] = "babe@binets.polytechnique.fr"
         account = operation.target
         if account.owner.email:
             message["recipient_list"] = [account.owner.email]

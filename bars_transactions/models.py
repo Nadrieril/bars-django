@@ -183,7 +183,7 @@ class AccountOperation(BaseOperation):
             if self.transaction.author.email:
                 message["from_email"] = self.transaction.author.email
             else:
-                message["from_email"] = "babe@eleves.polytechnique.fr"
+                message["from_email"] = "babe@binets.polytechnique.fr"
             if self.target.owner.email:
                 message["recipient_list"] = [self.target.owner.email]
                 message["message"] = message["message"].format(
