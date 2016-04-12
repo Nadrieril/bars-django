@@ -107,8 +107,13 @@ DEFAULT_CHARSET = "utf-8"
 
 # Static files (CSS, JavaScript, Images)
 
-STATIC_URL = '/api/static/'
-STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static/')
+STATIC_URL = '/assets/static/'
+
+STATIC_ROOT = os.path.join(PROJECT_ROOT, "assets/static/")
+
+MEDIA_ROOT = os.path.join(PROJECT_ROOT, "assets/media/")
+
+MEDIA_URL = '/assets/media/'
 
 # Rest framework
 

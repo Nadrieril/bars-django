@@ -1,13 +1,6 @@
 from .common import *
 
-ALLOWED_HOSTS = [
-    "localhost",
-    "chocapix",
-    "chocapix.bin",
-    "chocapix.binets.fr",
-    "chocapix.eleves.polytechnique.fr",
-    "bars.nadrieril.fr"
-]
+ALLOWED_HOSTS = [ "*" ]
 
 DATABASES = {
     'default': {
@@ -18,9 +11,6 @@ DATABASES = {
         'PASSWORD': 'root',
     }
 }
-
-EMAIL_HOST = "frankiz"
-EMAIL_PORT = 25
 
 ADMINS = (("Babe", "babe@binets.polytechnique.fr"),)
 SERVER_EMAIL = 'babe@binets.polytechnique.fr'
