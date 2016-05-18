@@ -56,6 +56,7 @@ class TransactionTests(APITestCase):
 
     def setUp(self):
         self.transaction.canceled = False
+        self.transaction.uncanceled = False
         self.transaction.save()
         Role.objects.get_or_create(user=self.user, bar=self.bar, name='customer')
         self.user = reload(self.user)
@@ -69,6 +70,7 @@ class TransactionTests(APITestCase):
 
     def test_restore_transaction(self):
         self.transaction.canceled = True
+        self.transaction.uncanceled = True
         self.transaction.save()
         self.client.force_authenticate(user=self.user)
 
