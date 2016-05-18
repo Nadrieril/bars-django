@@ -19,6 +19,7 @@ class Transaction(models.Model):
     type = models.CharField(max_length=25)
     timestamp = models.DateTimeField(auto_now_add=True)
     canceled = models.BooleanField(default=False)
+    uncanceled = models.BooleanField(default=False)
     last_modified = models.DateTimeField(auto_now=True)
     _type = VirtualField("Transaction")
     moneyflow = models.FloatField(default=0)
