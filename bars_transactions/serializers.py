@@ -1,4 +1,6 @@
 # encoding: utf8
+import math
+
 from django.core.mail import send_mail
 from django.utils import timezone
 
@@ -120,6 +122,8 @@ class ItemQtySerializer(serializers.Serializer):
 
         elif "sellitem" in data:
             sellitem = data['sellitem']
+            if not sellitem.sell_fraction:
+                qty = math.ceil(qty)
             total_qty = sellitem.calc_qty()
             stockitems = sellitem.stockitems.all()
 
