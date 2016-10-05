@@ -28,6 +28,8 @@ class SellItem(models.Model):
     unit_name = models.CharField(max_length=100, blank=True)
     unit_name_plural = models.CharField(max_length=100, blank=True)
 
+    sell_fraction = models.BooleanField(default=True)
+
     tax = models.FloatField(default=0)
 
     deleted = models.BooleanField(default=False)
