@@ -76,7 +76,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
         except Transaction.DoesNotExist:
             raise Http404()
 
-        if request.user.has_perm('bars_transactions.change_transaction', transaction):
+        if request.user.has_perm('bars_transactions.change_transaction', transaction) and (not transaction.uncanceled):
             transaction.canceled = True
             transaction.save()
 
@@ -101,6 +101,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
 
         if request.user.has_perm('bars_transactions.change_transaction', transaction):
             transaction.canceled = False
+            transaction.uncanceled = True
             transaction.save()
 
             for aop in transaction.accountoperation_set.all():
